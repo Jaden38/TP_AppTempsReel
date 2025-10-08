@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau Collaboratif Sécurisé</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #48bb78;
+            --danger: #f56565;
+            --warning: #ed8936;
+            --dark: #1a202c;
+            --gray-dark: #2d3748;
+            --gray: #4a5568;
+            --gray-light: #cbd5e0;
+            --gray-lighter: #e2e8f0;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: var(--white);
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-badge {
+            background: var(--primary);
+            color: var(--white);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-logout {
+            background: var(--gray);
+            color: var(--white);
+        }
+
+        /* Auth Section */
+        #auth-section {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        #auth-section.hidden {
+            display: none;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: var(--gray-lighter);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray-dark);
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--gray-lighter);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        #board-section.hidden {
+            display: none;
+        }
+
+        .add-note-form {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .note-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: noteAppear 0.3s ease-out;
+        }
+
+        @keyframes noteAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--gray-lighter);
+        }
+
+        .note-author {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .note-date {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .note-content {
+            color: var(--gray-dark);
+            line-height: 1.6;
+            margin-bottom: 15px;
+            word-wrap: break-word;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .note-actions button {
+            flex: 1;
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--white);
+        }
+
+        .empty-state h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Auth Section -->
+        <div id="auth-section">
+            <h1 style="text-align: center; margin-bottom: 30px;">🔐 Tableau Collaboratif</h1>
+            
+            <div class="auth-tabs">
+                <button class="tab active" onclick="showLoginForm()">Connexion</button>
+                <button class="tab" onclick="showRegisterForm()">Inscription</button>
+            </div>
+
+            <div class="error-message" id="auth-error"></div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Nom d'utilisateur</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Se connecter
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="hidden">
+                <div class="form-group">
+                    <label>Nom d'utilisateur</label>
+                    <input type="text" id="register-username" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe (min. 4 caractères)</label>
+                    <input type="password" id="register-password" required minlength="4">
+                </div>
+                <button type="submit" class="btn btn-secondary" style="width: 100%;">
+                    S'inscrire
+                </button>
+            </form>
+        </div>
+
+        <!-- Board Section -->
+        <div id="board-section" class="hidden">
+            <header>
+                <h1>📝 Tableau Collaboratif</h1>
+                <div class="user-info">
+                    <span class="user-badge" id="current-user"></span>
+                    <button class="btn btn-logout" onclick="logout()">Déconnexion</button>
+                </div>
+            </header>
+
+            <div class="add-note-form">
+                <h2 style="margin-bottom: 15px; color: var(--gray-dark);">Ajouter une note</h2>
+                <form id="note-form">
+                    <div class="form-group">
+                        <textarea id="note-content" placeholder="Écrivez votre note ici..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ajouter la note</button>
+                </form>
+            </div>
+
+            <div id="notes-container">
+                <div class="empty-state">
+                    <h2>Aucune note pour le moment</h2>
+                    <p>Créez la première note ci-dessus !</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/app.js"></script>
+</body>
+</html>
