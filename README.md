@@ -1,3 +1,31 @@
+# TP WebSockets & Communication Temps Réel
+
+## 📚 Description
+
+Repository contenant les travaux pratiques sur les technologies de communication temps réel avec WebSockets et Socket.IO. Chaque dossier correspond à un exercice indépendant avec son propre serveur et client.
+
+## 🚀 Démarrage Rapide
+
+### Prérequis
+- Node.js (v14+)
+- npm ou yarn
+- Navigateur web moderne
+
+### Installation Globale
+```bash
+# Cloner le repository
+git clone [url-du-repo]
+cd TP_AppTempsReel
+
+# Se déplacer dans un exercice
+cd [nom-du-dossier-exercice]
+
+# Installer les dépendances
+npm install
+
+# Démarrer le serveur
+node server.js   # ou node index.js selon l'exercice
+
 
 ```
 AppTempsReel
@@ -33,6 +61,12 @@ AppTempsReel
 │  │  ├─ image-1.png
 │  │  ├─ image-2.png
 │  │  └─ image-3.png
+│  └─ server.js
+├─ exercise_4_websocket_capitalizer
+│  ├─ client.js
+│  ├─ index.html
+│  ├─ package.json
+│  ├─ README.md
 │  └─ server.js
 ├─ exercise_5_chat-multi-salons
 │  ├─ index.html
