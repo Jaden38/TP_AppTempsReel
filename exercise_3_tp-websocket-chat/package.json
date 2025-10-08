@@ -1,5 +1,5 @@
 {
-  "name": "tp-websocket-chat",
+  "name": "exercise_3_tp-websocket-chat",
   "version": "1.0.0",
   "description": "Application de chat temps réel avec WebSocket",
   "main": "server.js",

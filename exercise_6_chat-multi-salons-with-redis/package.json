@@ -1,17 +1,32 @@
 {
-  "name": "exercice_2_chat-multi-salons",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "chat-multi-salons-redis",
+  "version": "2.0.0",
+  "description": "Application de chat multi-salons avec Redis Pub/Sub pour la scalabilité",
+  "main": "index-redis.js",
   "scripts": {
+    "start": "node index-redis.js",
+    "start:dev": "nodemon index-redis.js",
+    "start:instance1": "PORT=3000 node index-redis.js",
+    "start:instance2": "PORT=3001 node index-redis.js",
+    "start:instance3": "PORT=3002 node index-redis.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "chat",
+    "websocket",
+    "redis",
+    "pubsub",
+    "scalability"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "express": "^5.1.0",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "redis": "^4.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }
