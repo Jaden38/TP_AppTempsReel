@@ -1,3 +1,4 @@
 Cours-Live-App-Temps-Reel/
 **/node_modules
 **/package-lock.json
+**/.env

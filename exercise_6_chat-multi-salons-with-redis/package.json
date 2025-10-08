@@ -2,13 +2,13 @@
   "name": "chat-multi-salons-redis",
   "version": "2.0.0",
   "description": "Application de chat multi-salons avec Redis Pub/Sub pour la scalabilité",
-  "main": "index-redis.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node index-redis.js",
-    "start:dev": "nodemon index-redis.js",
-    "start:instance1": "PORT=3000 node index-redis.js",
-    "start:instance2": "PORT=3001 node index-redis.js",
-    "start:instance3": "PORT=3002 node index-redis.js",
+    "start": "node index.js",
+    "start:dev": "nodemon index.js",
+    "start:instance1": "cross-env PORT=3000 node index.js",
+    "start:instance2": "cross-env PORT=3001 node index.js",
+    "start:instance3": "cross-env PORT=3002 node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -24,9 +24,10 @@
   "dependencies": {
     "express": "^5.1.0",
     "socket.io": "^4.8.1",
-    "redis": "^4.7.0"
+    "redis": "^5.8.3"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.10",
+    "cross-env": "^10.1.0"
   }
 }

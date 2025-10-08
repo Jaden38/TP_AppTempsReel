@@ -76,6 +76,12 @@ AppTempsReel
 │  ├─ index.js
 │  ├─ package.json
 │  └─ README.md
+├─ exercise_6_chat-multi-salons-with-redis
+│  ├─ docker-compose.yml
+│  ├─ index.html
+│  ├─ index.js
+│  ├─ package.json
+│  └─ README.md
 └─ README.md
 
 ```
