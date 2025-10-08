@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat WebSocket - Temps Réel</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Modal pour le nom d'utilisateur -->
+        <div id="usernameModal" class="modal active">
+            <div class="modal-content">
+                <h2>Bienvenue dans le Chat WebSocket!</h2>
+                <p>Choisissez votre nom d'utilisateur pour commencer</p>
+                <input type="text" id="usernameInput" placeholder="Entrez votre nom d'utilisateur" maxlength="20">
+                <button id="setUsernameBtn">Rejoindre le chat</button>
+                <div id="usernameError" class="error-message"></div>
+            </div>
+        </div>
+
+        <!-- Interface principale du chat -->
+        <div class="chat-container">
+            <!-- En-tête -->
+            <header class="chat-header">
+                <div class="header-left">
+                    <h1>💬 Chat WebSocket</h1>
+                    <div class="connection-status">
+                        <span class="status-indicator" id="statusIndicator"></span>
+                        <span id="statusText">Déconnecté</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <span id="currentUser"></span>
+                </div>
+            </header>
+
+            <!-- Corps du chat -->
+            <div class="chat-body">
+                <!-- Liste des utilisateurs -->
+                <aside class="users-sidebar">
+                    <h3>Utilisateurs en ligne (<span id="userCount">0</span>)</h3>
+                    <ul id="usersList"></ul>
+                    <div class="sidebar-footer">
+                        <h4>Commandes:</h4>
+                        <p><code>/msg [user] [message]</code> - Message privé</p>
+                        <p><code>/clear</code> - Effacer le chat</p>
+                        <p><code>/help</code> - Aide</p>
+                    </div>
+                </aside>
+
+                <!-- Zone de messages -->
+                <main class="messages-area">
+                    <div id="messagesContainer">
+                        <div class="system-message">
+                            <p>Bienvenue dans le chat! Choisissez un nom d'utilisateur pour commencer.</p>
+                        </div>
+                    </div>
+                    <div id="typingIndicator" class="typing-indicator"></div>
+                </main>
+            </div>
+
+            <!-- Zone de saisie -->
+            <footer class="chat-footer">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Tapez votre message..." 
+                        disabled
+                        autocomplete="off"
+                    >
+                    <button id="sendBtn" disabled>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 8L11 13"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="footer-info">
+                    <span id="charCount">0/500</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Sons de notification -->
+    <audio id="notificationSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBi1xyuDWizEGHGS/7+OZURE" type="audio/wav">
+    </audio>
+
+    <script src="js/chat.js"></script>
+</body>
+</html>

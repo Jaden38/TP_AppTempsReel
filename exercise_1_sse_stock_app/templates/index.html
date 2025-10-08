@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Boursier en Temps Réel</title>
+    <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>📈 Dashboard Boursier en Temps Réel</h1>
+        <div class="controls">
+            <div class="filter-group">
+                <label>Prix minimum (€)</label>
+                <input type="number" id="priceFilter" placeholder="0" min="0" step="0.01">
+            </div>
+            <div class="filter-group">
+                <label>Symbole</label>
+                <select id="symbolFilter">
+                    <option value="">Tous les symboles</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Secteur</label>
+                <select id="sectorFilter">
+                    <option value="">Tous les secteurs</option>
+                </select>
+            </div>
+            <div class="connection-status" id="connectionStatus">
+                <div class="status-indicator"></div>
+                <span>Connexion...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="content-layout">
+            <div class="left-panel">
+                <div class="market-summary" id="marketSummary" style="display: none;">
+                    <div class="summary-item">
+                        <div class="value" id="marketTrend">--</div>
+                        <div class="label">Tendance</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="value" id="activeStocks">--</div>
+                        <div class="label">Actions actives</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="value" id="avgChange">--</div>
+                        <div class="label">Variation moyenne</div>
+                    </div>
+                </div>
+
+                <div id="stock-quotes">
+                    <div class="no-stocks">En attente des données de marché...</div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="alerts-sidebar">
+                    <div class="alerts-header">
+                        <h3>Alertes du Marché</h3>
+                        <div class="alerts-count" id="alertsCount">0</div>
+                    </div>
+                    <div class="alerts-container" id="alertsContainer">
+                        <div class="no-alerts">Aucune alerte pour le moment</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/js/dashboard.js"></script>
+</body>
+</html>

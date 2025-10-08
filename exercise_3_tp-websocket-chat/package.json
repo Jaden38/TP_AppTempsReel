@@ -1,0 +1,19 @@
+{
+  "name": "tp-websocket-chat",
+  "version": "1.0.0",
+  "description": "Application de chat temps réel avec WebSocket",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["websocket", "chat", "realtime"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

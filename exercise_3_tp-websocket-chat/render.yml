@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: websocket-chat
+    runtime: node
+    repo: https://github.com/Jaden38/tp-websocket-chat
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /
+    autoDeploy: true
