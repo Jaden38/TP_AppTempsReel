@@ -26,6 +26,9 @@ npm install
 # Démarrer le serveur
 node server.js   # ou node index.js selon l'exercice
 
+```
+
+## Structure
 
 ```
 AppTempsReel
