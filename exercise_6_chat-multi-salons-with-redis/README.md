@@ -21,29 +21,47 @@ Avec Redis Pub/Sub :
 
 ## 🏗️ Architecture
 
+```mermaid
+graph TB
+    subgraph Clients["Clients Web"]
+        C1["👤 Client 1<br/>(Alice)<br/>localhost:3000"]
+        C2["👤 Client 2<br/>(Bob)<br/>localhost:3001"]
+        C3["👤 Client 3<br/>(Charlie)<br/>localhost:3002"]
+    end
+    
+    subgraph Serveurs["Instances de Serveur"]
+        S1["🖥️ Serveur Instance 1<br/>Port 3000"]
+        S2["🖥️ Serveur Instance 2<br/>Port 3001"]
+        S3["🖥️ Serveur Instance 3<br/>Port 3002"]
+    end
+    
+    subgraph Redis["Cache & Pub/Sub"]
+        R[("🔴 Redis<br/>Port 6379")]
+    end
+    
+    C1 ---|WebSocket| S1
+    C2 ---|WebSocket| S2
+    C3 ---|WebSocket| S3
+    
+    S1 <--->|Pub/Sub<br/>chat:messages<br/>chat:room-notifications| R
+    S2 <--->|Pub/Sub<br/>chat:messages<br/>chat:room-notifications| R
+    S3 <--->|Pub/Sub<br/>chat:messages<br/>chat:room-notifications| R
+    
+    style C1 fill:#667eea,stroke:#5a67d8,color:#fff
+    style C2 fill:#667eea,stroke:#5a67d8,color:#fff
+    style C3 fill:#667eea,stroke:#5a67d8,color:#fff
+    style S1 fill:#48bb78,stroke:#38a169,color:#fff
+    style S2 fill:#48bb78,stroke:#38a169,color:#fff
+    style S3 fill:#48bb78,stroke:#38a169,color:#fff
+    style R fill:#f56565,stroke:#e53e3e,color:#fff
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  Client 1   │     │  Client 2   │     │  Client 3   │
-│ (Instance 1)│     │ (Instance 2)│     │ (Instance 1)│
-└──────┬──────┘     └──────┬──────┘     └──────┬──────┘
-       │                   │                   │
-       │ WebSocket         │ WebSocket         │ WebSocket
-       │                   │                   │
-┌──────▼──────┐     ┌──────▼──────┐
-│  Serveur    │     │  Serveur    │
-│  Instance 1 │     │  Instance 2 │
-│  (Port 3000)│     │  (Port 3001)│
-└──────┬──────┘     └──────┬──────┘
-       │                   │
-       │ Pub/Sub           │ Pub/Sub
-       │                   │
-       └───────┬───────────┘
-               │
-        ┌──────▼──────┐
-        │    Redis    │
-        │  (Port 6379)│
-        └─────────────┘
-```
+
+**Flux de données :**
+1. 📤 Alice (3000) envoie "Bonjour!" → WebSocket → Serveur Instance 1
+2. 📢 Instance 1 publie sur Redis → `PUBLISH chat:messages {...}`
+3. 📡 Redis diffuse à TOUTES les instances (1, 2, 3)
+4. 📥 Instances 1, 2, 3 reçoivent le message → Envoient via WebSocket à leurs clients
+5. ✅ Alice, Bob ET Charlie reçoivent tous le message, même s'ils sont sur des serveurs différents !
 
 ## 📁 Structure du Projet
 
@@ -105,6 +123,8 @@ npm start
 ```
 
 Ouvrez votre navigateur sur `http://localhost:3000`
+
+*Note : Avec une seule instance, vous ne verrez pas l'avantage de Redis. Lancez plusieurs instances pour le test complet !*
 
 ### Scénario 2 : Test avec plusieurs instances (recommandé)
 
