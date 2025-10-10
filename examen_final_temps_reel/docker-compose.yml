@@ -1,0 +1,32 @@
+services:
+  redis:
+    image: redis:8.2
+    container_name: collabboard-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  app:
+    image: node:24.10
+    working_dir: /usr/src/app
+    restart: unless-stopped
+    volumes:
+      - .:/usr/src/app
+    command: ["node", "server/index-redis.js"]
+    environment:
+      - PORT=3000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      # - REDIS_PASSWORD=mysecretpassword
+      - INSTANCE_ID=${HOSTNAME}
+
+    ports:
+      - "3000-3010:3000"
+    depends_on:
+      - redis
+
+volumes:
+  redis_data:
