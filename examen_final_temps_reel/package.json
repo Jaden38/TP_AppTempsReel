@@ -1,0 +1,28 @@
+{
+  "name": "collabboard-server",
+  "version": "1.0.0",
+  "description": "CollabBoard - Éditeur de texte collaboratif temps réel avec Socket.IO",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "start:redis": "node server/index-redis.js",
+    "dev": "nodemon server/index.js",
+    "dev:redis": "nodemon server/index-redis.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "optionalDependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
+    "redis": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

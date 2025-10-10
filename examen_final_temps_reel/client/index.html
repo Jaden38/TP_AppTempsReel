@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CollabBoard - Éditeur Collaboratif Temps Réel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        /* Login Screen */
+        #loginScreen {
+            padding: 60px 40px;
+            text-align: center;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        #loginScreen h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        #loginScreen p {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        /* Token Display Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .modal-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .token-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 2px dashed #667eea;
+        }
+        
+        .token-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .token-value {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #333;
+            word-break: break-all;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        
+        .copy-btn:hover {
+            background: #5568d3;
+        }
+        
+        .copy-btn.copied {
+            background: #4caf50;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #856404;
+        }
+        
+        .warning-box strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        /* Editor Screen */
+        #editorScreen {
+            display: none;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h2 {
+            font-size: 1.5em;
+        }
+        
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .room-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .main-content {
+            display: flex;
+            height: 500px;
+        }
+        
+        .editor-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #editor {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            resize: none;
+            transition: border-color 0.3s;
+        }
+        
+        #editor:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .typing-indicators {
+            margin-top: 10px;
+            min-height: 25px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-left: 1px solid #e0e0e0;
+        }
+        
+        .sidebar h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .user-list {
+            list-style: none;
+        }
+        
+        .user-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .user-name {
+            flex: 1;
+            color: #333;
+        }
+        
+        .user-status {
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .notifications {
+            margin-top: 30px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .notification {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+            border-left: 3px solid #667eea;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success {
+            border-left-color: #4caf50;
+        }
+        
+        .notification.warning {
+            border-left-color: #ff9800;
+        }
+        
+        .notification.error {
+            border-left-color: #f44336;
+        }
+        
+        .stats {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .error-message {
+            color: #f44336;
+            margin-top: 10px;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #e0e0e0;
+            }
+            
+            #editor {
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen">
+            <h1>🚀 CollabBoard</h1>
+            <p>Éditeur de texte collaboratif en temps réel</p>
+            
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="username">Nom d'utilisateur</label>
+                    <input type="text" id="username" placeholder="Entrez votre pseudo" maxlength="20" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="roomId">ID de la Room</label>
+                    <input type="text" id="roomId" placeholder="Ex: room-abc123">
+                </div>
+                
+                <div class="form-group">
+                    <label for="token">Token d'accès</label>
+                    <input type="password" id="token" placeholder="Token de sécurité">
+                </div>
+                
+                <div class="error-message" id="loginError"></div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="createRoom()">Créer une Room</button>
+                    <button class="btn btn-primary" onclick="joinRoom()">Rejoindre</button>
+                </div>
+            </div>
+            
+            <div class="spinner" id="loginSpinner"></div>
+        </div>
+        
+        <!-- Editor Screen -->
+        <div id="editorScreen">
+            <div class="header">
+                <h2>CollabBoard</h2>
+                <div class="room-info">
+                    <div class="room-badge" id="roomBadge">Room: -</div>
+                    <div class="room-badge" id="userBadge">User: -</div>
+                    <button class="btn btn-secondary" onclick="disconnect()">Déconnexion</button>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="editor-section">
+                    <textarea id="editor" placeholder="Commencez à taper... Vos modifications seront synchronisées en temps réel!"></textarea>
+                    <div class="typing-indicators" id="typingIndicators"></div>
+                </div>
+                
+                <div class="sidebar">
+                    <h3>👥 Utilisateurs connectés</h3>
+                    <ul class="user-list" id="userList"></ul>
+                    
+                    <div class="stats">
+                        <h3>📊 Statistiques</h3>
+                        <div class="stat-item">
+                            <span>Caractères:</span>
+                            <span class="stat-value" id="charCount">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Mots:</span>
+                            <span class="stat-value" id="wordCount">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Lignes:</span>
+                            <span class="stat-value" id="lineCount">0</span>
+                        </div>
+                    </div>
+                    
+                    <h3>📢 Notifications</h3>
+                    <div class="notifications" id="notifications"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Token Modal -->
+    <div id="tokenModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎉 Room créée avec succès !</h2>
+                <p>Partagez ces informations avec vos collaborateurs</p>
+            </div>
+            
+            <div class="token-display">
+                <div class="token-label">Room ID</div>
+                <div class="token-value">
+                    <span id="displayRoomId"></span>
+                    <button class="copy-btn" onclick="copyToClipboard('displayRoomId', this)">Copier</button>
+                </div>
+            </div>
+            
+            <div class="token-display">
+                <div class="token-label">Token d'accès</div>
+                <div class="token-value">
+                    <span id="displayToken"></span>
+                    <button class="copy-btn" onclick="copyToClipboard('displayToken', this)">Copier</button>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <strong>⚠️ Important :</strong>
+                Conservez ces informations ! Le token est nécessaire pour que d'autres utilisateurs puissent rejoindre votre room.
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="closeTokenModal()">J'ai compris</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Variables globales
+        let socket = null;
+        let currentUser = null;
+        let currentRoom = null;
+        let typingUsers = new Map();
+        let typingTimeout = null;
+        let isUpdating = false;
+
+        // Éléments DOM
+        const loginScreen = document.getElementById('loginScreen');
+        const editorScreen = document.getElementById('editorScreen');
+        const usernameInput = document.getElementById('username');
+        const roomIdInput = document.getElementById('roomId');
+        const tokenInput = document.getElementById('token');
+        const editor = document.getElementById('editor');
+        const userList = document.getElementById('userList');
+        const notifications = document.getElementById('notifications');
+        const typingIndicators = document.getElementById('typingIndicators');
+        const loginError = document.getElementById('loginError');
+        const loginSpinner = document.getElementById('loginSpinner');
+        const tokenModal = document.getElementById('tokenModal');
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            usernameInput.focus();
+            
+            usernameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') roomIdInput.focus();
+            });
+            
+            roomIdInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') tokenInput.focus();
+            });
+            
+            tokenInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') joinRoom();
+            });
+            
+            editor.addEventListener('input', handleEditorInput);
+            editor.addEventListener('keydown', handleTyping);
+        });
+
+        // Créer une nouvelle room avec modal d'affichage
+        async function createRoom() {
+            showLoginSpinner(true);
+            hideError();
+            
+            try {
+                const response = await fetch('/api/create-room', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la création de la room');
+                }
+                
+                const data = await response.json();
+                
+                // Remplir automatiquement les champs
+                roomIdInput.value = data.roomId;
+                tokenInput.value = data.token;
+                
+                // Afficher le modal avec les infos
+                document.getElementById('displayRoomId').textContent = data.roomId;
+                document.getElementById('displayToken').textContent = data.token;
+                tokenModal.style.display = 'block';
+                
+                if (!usernameInput.value) {
+                    usernameInput.focus();
+                }
+                
+            } catch (error) {
+                showError('Impossible de créer une room. Veuillez réessayer.');
+                console.error('Error creating room:', error);
+            } finally {
+                showLoginSpinner(false);
+            }
+        }
+
+        // Fermer le modal
+        function closeTokenModal() {
+            tokenModal.style.display = 'none';
+            if (!usernameInput.value) {
+                usernameInput.focus();
+            }
+        }
+
+        // Copier dans le presse-papier
+        function copyToClipboard(elementId, button) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓ Copié';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Erreur de copie:', err);
+                alert('Impossible de copier. Copiez manuellement: ' + text);
+            });
+        }
+
+        // Rejoindre une room
+        function joinRoom() {
+            const username = usernameInput.value.trim();
+            const roomId = roomIdInput.value.trim();
+            const token = tokenInput.value.trim();
+            
+            if (!username) {
+                showError('Veuillez entrer un nom d\'utilisateur');
+                usernameInput.focus();
+                return;
+            }
+            
+            if (!roomId) {
+                showError('Veuillez entrer l\'ID de la room');
+                roomIdInput.focus();
+                return;
+            }
+            
+            if (!token) {
+                showError('Veuillez entrer le token d\'accès');
+                tokenInput.focus();
+                return;
+            }
+            
+            currentUser = username;
+            currentRoom = roomId;
+            connectToServer(username, roomId, token);
+        }
+
+        // Connexion au serveur Socket.IO
+        function connectToServer(username, roomId, token) {
+            showLoginSpinner(true);
+            hideError();
+            
+            socket = io({
+                auth: {
+                    username: username,
+                    roomId: roomId,
+                    token: token
+                },
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+                reconnectionAttempts: 5
+            });
+            
+            socket.on('connect', () => {
+                console.log('Connected to server');
+                showLoginSpinner(false);
+                switchToEditor();
+            });
+            
+            socket.on('initialize', (data) => {
+                isUpdating = true;
+                editor.value = data.content || '';
+                updateStats();
+                isUpdating = false;
+                updateUserList(data.users);
+            });
+            
+            socket.on('update', (data) => {
+                if (data.userId !== socket.id) {
+                    isUpdating = true;
+                    const cursorPosition = editor.selectionStart;
+                    editor.value = data.content;
+                    
+                    if (cursorPosition <= editor.value.length) {
+                        editor.setSelectionRange(cursorPosition, cursorPosition);
+                    }
+                    
+                    updateStats();
+                    isUpdating = false;
+                }
+            });
+            
+            socket.on('notification', (data) => {
+                let cssClass = 'success';
+                if (data.type === 'user-left') cssClass = 'warning';
+                if (data.type === 'server-shutdown') cssClass = 'error';
+                addNotification(data.message, cssClass);
+            });
+            
+            socket.on('users-update', (users) => {
+                updateUserList(users);
+            });
+            
+            socket.on('typing', (data) => {
+                if (data.userId !== socket.id) {
+                    if (data.isTyping) {
+                        typingUsers.set(data.userId, data.username);
+                    } else {
+                        typingUsers.delete(data.userId);
+                    }
+                    updateTypingIndicator();
+                }
+            });
+            
+            socket.on('connect_error', (error) => {
+                console.error('Connection error:', error);
+                showError(error.message || 'Impossible de se connecter au serveur');
+                showLoginSpinner(false);
+                
+                if (socket) {
+                    socket.disconnect();
+                    socket = null;
+                }
+            });
+            
+            socket.on('disconnect', (reason) => {
+                console.log('Disconnected:', reason);
+                if (reason === 'io server disconnect') {
+                    switchToLogin();
+                    showError('Déconnecté par le serveur');
+                } else if (reason === 'transport close' || reason === 'transport error') {
+                    addNotification('Connexion perdue. Tentative de reconnexion...', 'error');
+                }
+            });
+            
+            socket.on('reconnect', () => {
+                addNotification('Reconnecté au serveur', 'success');
+            });
+            
+            socket.on('reconnect_failed', () => {
+                addNotification('Impossible de se reconnecter', 'error');
+                switchToLogin();
+            });
+        }
+
+        function switchToEditor() {
+            loginScreen.style.display = 'none';
+            editorScreen.style.display = 'block';
+            document.getElementById('roomBadge').textContent = `Room: ${currentRoom}`;
+            document.getElementById('userBadge').textContent = `User: ${currentUser}`;
+            editor.focus();
+        }
+
+        function switchToLogin() {
+            editorScreen.style.display = 'none';
+            loginScreen.style.display = 'block';
+            currentUser = null;
+            currentRoom = null;
+            editor.value = '';
+            userList.innerHTML = '';
+            notifications.innerHTML = '';
+            typingUsers.clear();
+            updateTypingIndicator();
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+            }
+            switchToLogin();
+            showNotification('Déconnecté avec succès', 'success');
+        }
+
+        function handleEditorInput(e) {
+            if (!isUpdating && socket && socket.connected) {
+                socket.emit('update', {
+                    content: editor.value
+                });
+                updateStats();
+            }
+        }
+
+        function handleTyping() {
+            if (!socket || !socket.connected) return;
+            
+            socket.emit('typing', true);
+            
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+            
+            typingTimeout = setTimeout(() => {
+                socket.emit('typing', false);
+            }, 1000);
+        }
+
+        function updateTypingIndicator() {
+            if (typingUsers.size === 0) {
+                typingIndicators.innerHTML = '';
+                return;
+            }
+            
+            const names = Array.from(typingUsers.values());
+            let text = '';
+            
+            if (names.length === 1) {
+                text = `${names[0]} est en train de taper...`;
+            } else if (names.length === 2) {
+                text = `${names[0]} et ${names[1]} sont en train de taper...`;
+            } else {
+                text = `${names.length} personnes sont en train de taper...`;
+            }
+            
+            typingIndicators.innerHTML = `<i>✏️ ${text}</i>`;
+        }
+
+        function updateUserList(users) {
+            userList.innerHTML = '';
+            
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.className = 'user-item';
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'user-avatar';
+                avatar.textContent = user.username.charAt(0).toUpperCase();
+                
+                const name = document.createElement('div');
+                name.className = 'user-name';
+                name.textContent = user.username;
+                if (user.id === socket?.id) {
+                    name.textContent += ' (vous)';
+                }
+                
+                const status = document.createElement('div');
+                status.className = 'user-status';
+                
+                li.appendChild(avatar);
+                li.appendChild(name);
+                li.appendChild(status);
+                
+                userList.appendChild(li);
+            });
+        }
+
+        function addNotification(message, cssClass = '') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${cssClass}`;
+            
+            const time = new Date().toLocaleTimeString('fr-FR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            notification.innerHTML = `<strong>${time}</strong> - ${message}`;
+            notifications.insertBefore(notification, notifications.firstChild);
+            
+            while (notifications.children.length > 10) {
+                notifications.removeChild(notifications.lastChild);
+            }
+            
+            notifications.scrollTop = 0;
+        }
+
+        function updateStats() {
+            const text = editor.value;
+            document.getElementById('charCount').textContent = text.length;
+            
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+            document.getElementById('wordCount').textContent = words.length;
+            
+            const lines = text.split('\n');
+            document.getElementById('lineCount').textContent = lines.length;
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        function showError(message) {
+            loginError.textContent = message;
+            loginError.style.display = 'block';
+        }
+
+        function hideError() {
+            loginError.style.display = 'none';
+        }
+
+        function showLoginSpinner(show) {
+            loginSpinner.style.display = show ? 'block' : 'none';
+        }
+
+        // Fermer le modal en cliquant en dehors
+        window.onclick = function(event) {
+            if (event.target === tokenModal) {
+                closeTokenModal();
+            }
+        }
+
+        // Animation CSS pour les notifications temporaires
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Raccourci clavier pour debug
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'i' && socket) {
+                console.log('=== Debug Info ===');
+                console.log('Socket ID:', socket.id);
+                console.log('Connected:', socket.connected);
+                console.log('Room:', currentRoom);
+                console.log('User:', currentUser);
+                console.log('==================');
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
