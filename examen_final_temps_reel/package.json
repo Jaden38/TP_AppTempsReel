@@ -5,10 +5,9 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
-    "start:redis": "node server/index-redis.js",
     "dev": "nodemon server/index.js",
-    "dev:redis": "nodemon server/index-redis.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "loadtest": "artillery quick --count 50 --num 100 http://localhost:3000"
   },
   "dependencies": {
     "express": "^5.1.0",
@@ -16,7 +15,8 @@
     "cors": "^2.8.5"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "artillery": "^2.0.26"
   },
   "optionalDependencies": {
     "@socket.io/redis-adapter": "^8.3.0",

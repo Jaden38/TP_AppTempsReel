@@ -10,38 +10,79 @@ CollabBoard est une application web de collaboration en temps réel permettant �
 
 - Node.js (v14 ou supérieur)
 - npm ou yarn
-- Redis (optionnel, pour le bonus)
+- Redis (optionnel, pour le bonus / Docker)
+- Docker & Docker Compose (optionnel, pour version scalable avec Redis)
 
-### Installation
+### Installation (version locale)
 
 ```bash
 cd examen_final_temps_reel
 npm install
 ```
 
-### Commandes disponibles
+### Commandes disponibles (version locale)
 
 ```bash
 # Version standard (sans Redis)
 npm start          # Lance le serveur en production
 npm run dev        # Lance avec nodemon (auto-reload)
-
-# Version avec Redis Adapter (Bonus)
-npm run start:redis    # Lance avec Redis en production
-npm run dev:redis      # Lance avec Redis et nodemon
+npm run loadtest   # Lance un test de charge simple avec Artillery (50 utilisateurs, 100 requêtes chacun)
 ```
 
-### Accès à l'application
+### Accès à l'application (locale)
 
 1. Serveur principal :
+
 ```
 http://localhost:3000
 ```
 
 2. Endpoint de monitoring :
+
 ```
 http://localhost:3000/status
 ```
+
+---
+
+## 🐳 Version Redis / Docker et Scalabilité
+
+CollabBoard peut être exécuté avec Redis et Docker pour supporter plusieurs instances Node.js en parallèle, permettant ainsi une **scalabilité horizontale**.
+
+### 🔹 Lancer l’application avec Docker
+
+```bash
+docker-compose up --build
+```
+
+* **Redis** : port 6379
+* **App Node.js** : port 3000 (1 instance par défaut)
+
+### 🔹 Scalabilité avec plusieurs instances
+
+```bash
+docker-compose up --scale app=3
+```
+
+* `app=3` lance 3 instances Node.js
+* Chaque instance utilise Redis pour synchroniser les events Socket.IO
+* Limitation actuelle : ports exposés de 3000 à 3010 → maximum 11 instances
+
+### 🔹 Accès à l’application
+
+* Instances accessibles via `http://localhost:3000`, `http://localhost:3001`, etc.
+* Les sessions restent synchronisées via Redis.
+
+### 🔹 Exemple avec 5 instances
+
+```bash
+docker-compose up --scale app=5
+```
+
+* Ports exposés : 3000, 3001, 3002, 3003, 3004
+* Redis synchronise automatiquement les rooms entre toutes les instances
+
+---
 
 ## 🎯 Utilisation
 
@@ -66,6 +107,8 @@ http://localhost:3000/status
 - **Liste des utilisateurs** : Visualisez tous les participants connectés
 - **Notifications** : Restez informé des connexions/déconnexions
 - **Statistiques** : Compteur de caractères, mots et lignes en temps réel
+
+---
 
 ## 🛠 Architecture et Choix Techniques
 
@@ -169,34 +212,18 @@ Le serveur offre plusieurs niveaux de monitoring :
    - Nombre de rooms et d'utilisateurs
    - Uptime du serveur
 
-## 📊 Performance et Scalabilité
+---
 
-### Performance actuelle
+## 📊 Performance et Scalabilité
 
 - **Capacité** : ~1000 connexions simultanées par instance
 - **Latence** : < 50ms en local, < 200ms en réseau
 - **Taille max document** : 100KB
 - **Utilisation mémoire** : ~50MB pour 100 utilisateurs
 
-### Scalabilité (avec Redis Adapter)
+**Scalabilité avec Redis Adapter** : multiples instances Node.js synchronisées via Redis + load balancer (sticky sessions).
 
-Pour activer la scalabilité horizontale :
-
-1. Installer Redis localement ou utiliser Redis Cloud
-2. Décommenter la configuration Redis dans `server/index.js`
-3. Lancer plusieurs instances Node.js sur différents ports
-4. Utiliser un load balancer (nginx) avec sticky sessions
-
-```javascript
-// Configuration Redis (dans server/index.js)
-const { createAdapter } = require('@socket.io/redis-adapter');
-const { createClient } = require('redis');
-
-const pubClient = createClient({ host: 'localhost', port: 6379 });
-const subClient = pubClient.duplicate();
-
-io.adapter(createAdapter(pubClient, subClient));
-```
+---
 
 ## 🧪 Tests Recommandés
 
@@ -211,9 +238,13 @@ io.adapter(createAdapter(pubClient, subClient));
 ### Tests de Performance
 
 ```bash
-# Avec Artillery (npm install -g artillery)
+# Avec Artillery
+
+npm install artillery
 artillery quick --count 50 --num 10 http://localhost:3000
 ```
+
+---
 
 ## 📈 Améliorations Futures
 
@@ -225,29 +256,3 @@ artillery quick --count 50 --num 10 http://localhost:3000
 6. **Authentification** : OAuth2, JWT persistants
 7. **Optimisation** : Operational Transform ou CRDT pour la résolution de conflits
 8. **PWA** : Support offline avec synchronisation différée
-
-## 🐛 Dépannage
-
-### Le serveur ne démarre pas
-- Vérifier que le port 3000 est libre
-- Vérifier l'installation des dépendances
-
-### Impossible de se connecter
-- Vérifier le token et l'ID de room
-- Vérifier la console du serveur pour les erreurs
-- Tester avec un navigateur récent (Chrome, Firefox, Edge)
-
-### Synchronisation lente
-- Vérifier la latence réseau
-- Réduire la fréquence des mises à jour (debouncing)
-- Activer la compression WebSocket
-
----
-
-**Note** : Pour la production, il est recommandé d'ajouter :
-- HTTPS avec certificats SSL
-- Base de données pour la persistance
-- CDN pour les assets statiques
-- Monitoring professionnel (Datadog, New Relic)
-- Tests automatisés (Jest, Mocha)
-- CI/CD pipeline
