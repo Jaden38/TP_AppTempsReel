@@ -2,39 +2,40 @@
 
 ### Polling Long (Long Polling)
 
-**Principe de fonctionnement :** Le client envoie une requête HTTP au serveur qui la maintient ouverte jusqu'à ce qu'une nouvelle donnée soit disponible ou qu'un timeout survienne. Après réception de la réponse, le client relance immédiatement une nouvelle requête, créant ainsi une connexion quasi-permanente.
+**Principe de fonctionnement :** Le client envoie une requête HTTP au serveur, qui la garde ouverte jusqu’à ce qu’une nouvelle donnée soit prête ou qu’un délai expire. Dès que le client reçoit une réponse, il renvoie immédiatement une nouvelle requête. Cela crée une sorte de connexion presque continue.
 
-**Sens de communication :** Principalement serveur → client, mais le client peut envoyer des données via des requêtes HTTP classiques séparées.
+**Sens de communication :** Principalement du serveur vers le client. Le client peut tout de même envoyer des données via des requêtes HTTP classiques.
 
-**Avantages :** Compatible avec tous les proxies et firewalls HTTP, fonctionne sur tous les navigateurs, simple à implémenter. Pas besoin de protocole spécial.
+**Avantages :** Fonctionne partout (navigateurs, proxies, firewalls), très simple à mettre en place et ne nécessite aucun protocole particulier.
 
-**Limites :** Latence importante (délai entre envoi et réception), surcharge serveur avec de nombreux clients (une connexion par client), consommation élevée de ressources, en-têtes HTTP répétés à chaque requête.
+**Limites :** Latence parfois élevée, surcharge côté serveur quand il y a beaucoup de clients, consommation importante de ressources et répétition d’en-têtes HTTP à chaque requête.
 
-**Cas d'usage typique :** Applications de notifications peu fréquentes, systèmes de messagerie basiques où la latence de quelques secondes est acceptable, fallback pour les environnements où WebSockets n'est pas supporté.
+**Cas d'usage typique :** Notifications occasionnelles, messageries simples ou environnements ne supportant pas WebSockets.
 
 ### Server-Sent Events (SSE)
 
-**Principe de fonctionnement :** Connexion HTTP persistante unidirectionnelle où le serveur envoie un flux continu de données textuelles au client via le protocole EventSource. Le serveur pousse les événements au format `data: message\n\n`.
+**Principe de fonctionnement :** SSE repose sur une connexion HTTP persistante unidirectionnelle. Le serveur envoie un flux continu de messages texte au client via le protocole `EventSource`. Chaque événement est transmis au format `data: message\n\n`.
 
-**Sens de communication :** Strictement unidirectionnel serveur → client. Pour envoyer des données, le client doit utiliser des requêtes HTTP classiques (AJAX, Fetch).
+**Sens de communication :** Uniquement du serveur vers le client. Si le client veut envoyer des données, il passe par une requête HTTP classique.
 
-**Avantages :** Simple à implémenter côté serveur, reconnexion automatique native, gestion des ID d'événements pour reprendre après déconnexion, fonctionne sur HTTP/1.1 et HTTP/2, compatible avec les proxies HTTP.
+**Avantages :** Mise en œuvre simple côté serveur, reconnexion automatique gérée nativement, gestion des ID d’événements pour reprendre après déconnexion. Compatible HTTP/1.1 et HTTP/2.
 
-**Limites :** Unidirectionnel uniquement, limitation à 6 connexions par domaine (navigateurs), format texte seulement, pas de support natif sur Internet Explorer, moins efficace que WebSocket pour le bidirectionnel.
+**Limites :** Unidirectionnel, limité à 6 connexions par domaine dans les navigateurs, uniquement du texte, non pris en charge par Internet Explorer.
 
-**Cas d'usage typique :** Flux de notifications en temps réel (Twitter feed, actualités), tableaux de bord de monitoring, cotations boursières, mises à jour de scores sportifs, systèmes où seul le serveur pousse des données.
+**Cas d'usage typique :** Flux d’actualités, tableaux de bord, cotations boursières, scores sportifs ou toute application où seul le serveur pousse des données.
+
 
 ### WebSockets
 
-**Principe de fonctionnement :** Protocole de communication full-duplex sur une seule connexion TCP. Après un handshake HTTP initial (upgrade), la connexion passe au protocole WebSocket permettant des échanges bidirectionnels avec overhead minimal (2-14 octets par frame).
+**Principe de fonctionnement :** WebSocket est un protocole full-duplex fonctionnant sur une unique connexion TCP. Après un handshake HTTP initial, la connexion bascule sur le protocole WebSocket, permettant des échanges bidirectionnels en continu avec un overhead minimal.
 
-**Sens de communication :** Bidirectionnel complet (client ↔ serveur), permettant l'envoi et la réception simultanés de données par les deux parties.
+**Sens de communication :** Bidirectionnel complet — le client et le serveur peuvent envoyer et recevoir des données simultanément.
 
-**Avantages :** Latence très faible, communication bidirectionnelle native, faible overhead après établissement, supporte données binaires et texte, idéal pour applications interactives temps réel, efficacité réseau maximale.
+**Avantages :** Latence très faible, communication bidirectionnelle native, faible consommation réseau, supporte le texte et le binaire, parfait pour les applications interactives temps réel.
 
-**Limites :** Complexité d'implémentation, certains proxies/firewalls peuvent bloquer, nécessite gestion manuelle de la reconnexion, pas de support natif sur anciens navigateurs, requiert infrastructure WebSocket côté serveur.
+**Limites :** Mise en place plus complexe, problèmes possibles avec certains proxies/firewalls, nécessite gestion des reconnexions, et pas supporté par d’anciens navigateurs.
 
-**Cas d'usage typique :** Applications de chat en temps réel, jeux multijoueurs en ligne, éditeurs collaboratifs (Google Docs), trading en temps réel, applications IoT nécessitant bidirectionnalité et faible latence.
+**Cas d'usage typique :** Chats temps réel, jeux multijoueurs, éditeurs collaboratifs, trading en direct, ou systèmes IoT nécessitant une communication rapide et continue.
 
 ---
 
@@ -42,7 +43,7 @@
 
 ### Namespaces
 
-**Rôle et intérêt :** Les namespaces permettent de segmenter logiquement une application Socket.IO en créant des canaux de communication séparés sur une même connexion. Chaque namespace est un point de connexion indépendant avec ses propres événements, middleware et rooms. Ils permettent d'organiser le code et d'isoler différentes fonctionnalités.
+**Rôle et intérêt :** Les namespaces servent à séparer logiquement différentes parties d’une application Socket.IO, tout en partageant une même connexion. Chaque namespace a ses propres événements, rooms et middleware. Cela facilite l’organisation du code et isole les fonctionnalités.
 
 **Exemple concret :** Dans une application d'entreprise, on peut avoir `/admin` pour les administrateurs, `/support` pour le service client, et `/public` pour les utilisateurs. Un utilisateur connecté à `/public` ne recevra jamais les messages envoyés sur `/admin`, assurant ainsi la séparation des préoccupations et la sécurité.
 
@@ -58,7 +59,7 @@ adminNamespace.on('connection', (socket) => {
 
 ### Rooms
 
-**Rôle et intérêt :** Les rooms sont des canaux arbitraires que les sockets peuvent rejoindre ou quitter au sein d'un namespace. Elles permettent de diffuser des messages à un sous-ensemble spécifique de clients connectés sans avoir à maintenir manuellement des listes de sockets. Chaque socket possède automatiquement une room privée identifiée par son ID.
+**Rôle et intérêt :** Les rooms sont comme des sous-canaux au sein d’un namespace. Un socket peut rejoindre ou quitter une room librement. Cela permet de cibler facilement un groupe d’utilisateurs sans devoir gérer des listes manuelles.
 
 **Exemple concret :** Dans une application de chat, chaque conversation ou salon peut être une room. Quand un utilisateur envoie un message dans "room-nodejs", seuls les membres de cette room le reçoivent. Les utilisateurs peuvent rejoindre/quitter dynamiquement plusieurs rooms.
 
@@ -72,7 +73,7 @@ socket.to('room-nodejs').emit('message', 'Hello room!');
 
 ### Broadcast
 
-**Rôle et intérêt :** Le broadcast permet d'envoyer un message à tous les clients connectés **sauf l'émetteur**. C'est un mécanisme essentiel pour propager des informations sans créer de boucle (éviter qu'un client reçoive son propre message). Il peut s'appliquer au namespace entier ou à une room spécifique.
+**Rôle et intérêt :** Le broadcast envoie un message à tous les clients sauf celui qui l’a émis. C’est pratique pour éviter les boucles (par exemple, quand un client envoie un message qu’il n’a pas besoin de recevoir lui-même).
 
 **Exemple concret :** Dans un éditeur collaboratif, quand un utilisateur modifie le document, son client envoie la modification au serveur qui la diffuse (broadcast) à tous les autres utilisateurs connectés sur ce document, mais pas à l'émetteur qui a déjà la modification localement.
 
@@ -90,11 +91,11 @@ socket.to('document-123').emit('document-update', changes);
 
 ### 1. Pourquoi les messages peuvent ne pas atteindre tous les clients ?
 
-Quand plusieurs instances Socket.IO tournent derrière un load balancer, chaque instance maintient sa propre liste de clients connectés en mémoire. Si un client A connecté à l'instance 1 envoie un message, seule l'instance 1 reçoit cet événement. Quand cette instance fait un `broadcast`, elle ne peut envoyer le message qu'aux clients connectés **localement** à elle-même. Les clients connectés aux instances 2, 3, etc. ne recevront jamais ce message car il n'y a aucun mécanisme de communication inter-instances par défaut. Chaque serveur Node.js fonctionne en isolation.
+Quand plusieurs serveurs Socket.IO tournent derrière un load balancer, chacun garde sa propre liste de clients. Si un client connecté à l’instance 1 envoie un message, seuls les utilisateurs sur cette instance le recevront. Les autres serveurs n’en sauront rien — il n’y a pas de communication native entre instances.
 
 ### 2. Comment Redis Pub/Sub résout ce problème
 
-Redis Pub/Sub agit comme un bus de messages central. L'adaptateur Redis pour Socket.IO publie automatiquement tous les événements broadcast sur un canal Redis. Toutes les instances Socket.IO souscrivent à ce canal. Ainsi, quand l'instance 1 émet un broadcast, elle publie sur Redis, et **toutes** les instances (1, 2, 3...) reçoivent ce message via leur souscription Redis et le redistribuent à leurs clients locaux respectifs. Redis synchronise donc l'état des événements entre toutes les instances, permettant une communication globale.
+Redis agit comme un bus de messages centralisé. Grâce à l’adaptateur Redis, chaque serveur publie ses messages sur un canal Redis. Tous les autres serveurs abonnés à ce canal les reçoivent à leur tour et les redistribuent à leurs propres clients. Cela garantit que tout le monde reste synchronisé, quelle que soit l’instance.
 
 ### 3. Architecture Socket.IO + Redis Adapter
 
