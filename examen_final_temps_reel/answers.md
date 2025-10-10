@@ -1,11 +1,3 @@
-# Réponses - Partie 1 : Théorie (Applications Web Temps Réel)
-
-**Étudiant :** [Votre Nom]  
-**Date :** 10 octobre 2025  
-**Durée :** 4h00
-
----
-
 ## Question 1 – Les technologies temps réel
 
 ### Polling Long (Long Polling)
