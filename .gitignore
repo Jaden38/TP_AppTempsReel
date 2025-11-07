@@ -2,3 +2,8 @@ Cours-Live-App-Temps-Reel/
 **/node_modules
 **/package-lock.json
 **/.env
+**/logs/
+**/*.log
+**/newrelic_agent.log
+**/npm-debug.log*
+**/.DS_Store
