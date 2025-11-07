@@ -51,37 +51,43 @@ node index.js
 
 ## 🧪 Tests
 
+Linux / WSL
+
 ```bash
-# Rendre le script exécutable
 chmod +x test.sh
-
-# Lancer les tests
 ./test.sh
+```
 
-# Ou manuellement
-curl http://localhost:3000/ping
-curl http://localhost:3000/slow
-curl http://localhost:3000/error
+Windows
+
+```bat
+test.bat
 ```
 
 ## 📊 Monitoring
 
 ### Winston Logs
 
-- **Console** : Logs colorisés en temps réel
-- **logs/app.log** : Tous les logs (rotation automatique à 5MB)
-- **logs/error.log** : Erreurs uniquement
+- **Console** : Logs colorisés en temps réel  
+- **logs/app.log** : Tous les logs (rotation automatique à 5 MB)  
+- **logs/error.log** : Erreurs uniquement  
 
 ### New Relic APM
 
-1. Connectez-vous à votre dashboard New Relic
-2. Allez dans APM → Applications
-3. Sélectionnez "tp-realtime-demo"
+1. Connectez-vous à votre dashboard New Relic  
+2. Allez dans **APM → Applications**  
+3. Sélectionnez **tp-realtime-demo**  
 4. Observez :
-   - Transactions
-   - Erreurs
-   - Latence
-   - Throughput
+   - Transactions  
+   - Erreurs  
+   - Latence  
+   - Throughput  
+
+#### 📸 Exemple de Dashboard New Relic
+
+Après plusieurs appels aux endpoints (`/ping`, `/slow`, `/error`, etc.), le dashboard peut ressembler à ceci :
+
+![Exemple de dashboard New Relic](screenshots/image-1.png)
 
 ## 🔍 Points Clés
 
@@ -94,23 +100,23 @@ require('newrelic');
 
 ### 2. Niveaux de Logs Winston
 
-- **error** : Erreurs critiques
-- **warn** : Avertissements
-- **info** : Informations générales
-- **debug** : Détails de débogage
+- **error** : Erreurs critiques  
+- **warn** : Avertissements  
+- **info** : Informations générales  
+- **debug** : Détails de débogage  
 
 ### 3. Rotation des Logs
 
-- Taille max : 5MB par fichier
-- Nombre max de fichiers : 5
-- Rotation automatique
+- Taille max : 5 MB par fichier  
+- Nombre max de fichiers : 5  
+- Rotation automatique  
 
 ## 📝 Endpoints Disponibles
 
 | Route | Méthode | Description |
-|-------|---------|-------------|
+|-------|----------|-------------|
 | `/ping` | GET | Health check simple |
-| `/slow` | GET | Simule une latence de 2s |
+| `/slow` | GET | Simule une latence de 2 s |
 | `/error` | GET | Génère une erreur intentionnelle |
 | `/test-logs` | GET | Teste tous les niveaux de logs |
 | `/data` | POST | Traite des données (léger/lourd) |
@@ -118,25 +124,21 @@ require('newrelic');
 
 ## 🎓 Questions de Réflexion
 
-1. **Pourquoi importer New Relic en premier ?**
-   - Pour instrumenter toutes les dépendances dès leur chargement
+1. **Pourquoi importer New Relic en premier ?**  
+   Pour instrumenter toutes les dépendances dès leur chargement.  
 
-2. **Pourquoi utiliser JSON pour les logs ?**
-   - Facilite le parsing et l'analyse automatique
-   - Structure uniforme pour les outils de monitoring
+2. **Pourquoi utiliser JSON pour les logs ?**  
+   Facilite le parsing et l’analyse automatique.  
 
-3. **Quelle limite au monitoring sans logs ?**
-   - Manque de contexte sur les erreurs
-   - Difficile de tracer le parcours utilisateur
+3. **Quelle limite au monitoring sans logs ?**  
+   Manque de contexte sur les erreurs.  
 
-4. **Comment scaler ce système ?**
-   - Centraliser les logs (ELK, Datadog)
-   - Utiliser des agents New Relic sur chaque instance
-   - Implémenter des correlation IDs
+4. **Comment scaler ce système ?**  
+   Centraliser les logs (ELK, Datadog)  
+   Utiliser des agents New Relic sur chaque instance  
+   Implémenter des correlation IDs  
 
 ## 🚀 Bonus : Socket.IO
-
-Pour ajouter Socket.IO et monitorer les événements temps réel :
 
 ```javascript
 const io = require('socket.io')(server);
@@ -145,10 +147,7 @@ io.on('connection', (socket) => {
   logger.info('Socket.IO connection', { socketId: socket.id });
   
   socket.on('message', (data) => {
-    logger.info('Socket message received', { 
-      socketId: socket.id,
-      data 
-    });
+    logger.info('Socket message received', { socketId: socket.id, data });
   });
   
   socket.on('disconnect', () => {
