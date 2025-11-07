@@ -26,6 +26,6 @@ cd [nom-du-dossier-exercice]
 npm install
 
 # Démarrer le serveur
-node server.js # ou peut varier selon l'exercice (voir README.md spécifique)
+node server.js # peut varier selon l'exercice (voir README.md spécifique)
 
 ```
