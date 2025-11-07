@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Sync App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="auth-container" class="container">
+        <h1>Realtime Sync App</h1>
+        <div class="auth-forms">
+            <div class="form-group">
+                <input type="text" id="username" placeholder="Username" />
+                <input type="password" id="password" placeholder="Password" />
+                <div class="btn-group">
+                    <button onclick="login()">Login</button>
+                    <button onclick="register()">Register</button>
+                </div>
+            </div>
+            <div id="auth-error" class="error"></div>
+        </div>
+    </div>
+    
+    <div id="app-container" class="container hidden">
+        <header>
+            <h1>Shared Items</h1>
+            <div class="header-info">
+                <span id="username-display"></span>
+                <span id="connection-status" class="status disconnected">●</span>
+                <button onclick="logout()">Logout</button>
+            </div>
+        </header>
+        
+        <div class="stats-bar">
+            <span>Online: <span id="online-count">0</span></span>
+            <span>Latency: <span id="latency">-</span>ms</span>
+            <span>Syncs: <span id="sync-count">0</span></span>
+        </div>
+        
+        <div class="add-item">
+            <input type="text" id="new-item" placeholder="Add new item..." />
+            <button onclick="addItem()">Add</button>
+        </div>
+        
+        <div id="items-container" class="items-container"></div>
+        
+        <div class="users-panel">
+            <h3>Connected Users</h3>
+            <ul id="users-list"></ul>
+        </div>
+        
+        <div class="logs-panel">
+            <h3>Sync Logs</h3>
+            <div id="sync-logs"></div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
