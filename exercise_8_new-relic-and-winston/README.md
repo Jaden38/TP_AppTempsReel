@@ -16,15 +16,32 @@ export NEW_RELIC_LICENSE_KEY="votre_clé_ici"
 ```
 
 ## 🚀 Démarrage
+
+### Option 1 : Avec export de variable d'environnement (recommandé)
 ```bash
-# Mode développement (avec nodemon)
+# Configurer la clé une fois pour la session
+export NEW_RELIC_LICENSE_KEY="votre_clé_ici"
+
+# Puis simplement lancer l'application
+node index.js
+
+# Ou en mode développement
 npm run dev
+```
 
-# Mode production
-npm start
-
-# Avec New Relic activé
+### Option 2 : Inline (pour un test rapide)
+```bash
+# Passer la clé directement dans la commande
 NEW_RELIC_LICENSE_KEY="votre_clé" node index.js
+```
+
+### Option 3 : Fichier .env (pour un usage permanent)
+```bash
+# Créer un fichier .env
+echo 'NEW_RELIC_LICENSE_KEY=votre_clé_ici' > .env
+
+# Puis lancer normalement
+node index.js
 ```
 
 ## 🧪 Tests
